@@ -75,18 +75,8 @@ $studentKey = 'student_' . $nextStudentIndex;
         'gender' => 'required|string|in:Male,Female',
     ]);
 
-    // Step 2: Reference the Firebase database for the specific student
     $studentReference = $this->database->getReference("school/classes/$classId/students/$studentId");
 
-    // Step 3: Check if the student exists
-    $existingStudent = $studentReference->getValue();
-
-    // If the student does not exist, handle the error
-    if (!$existingStudent) {
-        return redirect()->route('students.index')->with('error', 'Student not found!');
-    }
-
-    // Step 4: Update the student data with the validated data
     $studentReference->update([
         'name' => $validatedData['name'],
         'age' => $validatedData['age'],

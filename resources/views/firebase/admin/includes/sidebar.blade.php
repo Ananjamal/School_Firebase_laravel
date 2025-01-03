@@ -13,25 +13,31 @@
 
 
       <li class="nav-heading">School</li>
-
       <li class="nav-item">
-        <a href="{{route('classes.index')}}" class="nav-link collapsed" >
-            <i class="bi bi-house-door"></i>
+        <a href="{{route('classes.index')}}" class="nav-link collapsed">
+            <i class="bi bi-building"></i>
             <span>Classes</span>
         </a>
     </li>
     <li class="nav-item">
         <a href="{{route('students.index')}}" class="nav-link collapsed">
-            <i class="bi bi-person-fill"></i>
+            <i class="bi bi-people-fill"></i>
             <span>Students</span>
         </a>
     </li>
     <li class="nav-item">
         <a href="{{route('subjects.index')}}" class="nav-link collapsed">
-            <i class="bi bi-person-fill"></i>
-            <span>subjects</span>
+            <i class="bi bi-book"></i>
+            <span>Subjects</span>
         </a>
     </li>
+    <li class="nav-item">
+        <a href="{{route('staff.index')}}" class="nav-link collapsed">
+            <i class="bi bi-person-badge-fill"></i>
+            <span>Staff</span>
+        </a>
+    </li>
+
 
 
     </ul>

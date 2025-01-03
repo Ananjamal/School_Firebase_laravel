@@ -3,9 +3,11 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Firebase\ContactController;
 use App\Http\Controllers\Firebase\Admin\ClassController;
+use App\Http\Controllers\Firebase\Admin\StaffController;
 use App\Http\Controllers\Firebase\Admin\StudentController;
 use App\Http\Controllers\Firebase\Admin\SubjectController;
 use App\Http\Controllers\Firebase\Admin\DashboardController;
+use App\Http\Controllers\Firebase\Admin\SchoolInfoController;
 
 
 Route::get('/', function () {
@@ -25,7 +27,7 @@ Route::delete('/deleteUser/{id}', [ContactController::class, 'destroy'])->name('
 
 // Route::post('/firebase', [FirebaseController::class, 'store'])->name('firebase.store');
 // Route::delete('/firebase/{id}', [FirebaseController::class, 'destroy'])->name('firebase.destroy');
-Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+Route::get('/dashboard', [SchoolInfoController::class, 'index'])->name('dashboard');
 Route::resource('dashboard/classes', ClassController::class);
 // Use resource routing for the main student routes except for edit and update
 Route::resource('dashboard/students', StudentController::class)->except(['edit', 'update','distroy']);
@@ -37,6 +39,9 @@ Route::resource('dashboard/subjects', SubjectController::class)->except(['edit',
 Route::get('dashboard/classes/{classId}/subjects/{subjectId}/edit', [SubjectController::class, 'edit'])->name('subjects.edit');
 Route::put('dashboard/classes/{classId}/subjects/{subjectId}', [SubjectController::class, 'update'])->name('subjects.update');
 Route::delete('dashboard/classes/{classId}/subjects/{subjectId}', [SubjectController::class, 'destroy'])->name('subjects.destroy');
+
+
+Route::resource('dashboard/staff', StaffController::class);
 
 // Route::resource('dashboard/subjects', SubjectController::class);
 // Route::resource('dashboard/staff', StaffController::class);

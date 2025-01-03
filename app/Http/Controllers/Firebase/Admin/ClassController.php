@@ -41,8 +41,8 @@ class ClassController extends Controller
             'grade' => $validatedData['grade'],
             'section' => $validatedData['section'],
             'teacher' => $validatedData['teacher'],
-            'students' => null,
-            'subjects' => null,
+            'students' => [],
+            'subjects' => [],
         ];
 
         $this->database->getReference("school/classes/$newClassName")->set($newClassData);
@@ -58,7 +58,6 @@ class ClassController extends Controller
 
     public function update(Request $request, $id)
 {
-    // Validate the incoming request
     $validatedData = $request->validate([
         'grade' => 'required|string',
         'section' => 'required|string',
@@ -67,17 +66,23 @@ class ClassController extends Controller
 
     // Get the existing class data
     $classRef = $this->database->getReference("school/classes/$id");
-    $existingClass = $classRef->getValue();
+    // $existingClass = $classRef->getValue();
 
-    if (!$existingClass) {
-        return redirect()->route('classes.index')->with('error', 'Class not found.');
-    }
+    // if (!$existingClass) {
+    //     return redirect()->route('classes.index')->with('error', 'Class not found.');
+    // }
 
-    // Merge the existing data with the updated data
-    $updatedData = array_merge($existingClass, $validatedData);
+    // // Merge the existing data with the updated data
+    // $updatedData = array_merge($existingClass, $validatedData);
 
-    // Update the class in Firebase
-    $classRef->set($updatedData);
+    // // Update the class in Firebase
+    // $classRef->set($updatedData);
+    $classRef->update([
+        'grade' => $validatedData['grade'],
+        'section' => $validatedData['section'],
+        'teacher' => $validatedData['teacher'],
+
+    ]);
 
     return redirect()->route('classes.index')->with('success', 'Class updated successfully!');
 }
