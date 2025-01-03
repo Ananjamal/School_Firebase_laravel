@@ -20,12 +20,20 @@
             <div class="col-lg-12">
                 <div class="shadow-sm card">
                     <div class="card-body">
+                        @if(session('success'))
+                        <div class="shadow alert alert-success alert-dismissible fade show" role="alert">
+                            <strong>Success!</strong> {{ session('success') }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        @endif
                         <div class="mb-4 d-flex justify-content-between align-items-center">
                             <h5 class="mb-0 card-title">General Information</h5>
-                            <a href="#" class="btn btn-primary btn-sm">
+                            <a href="{{route('dashboard.edit')}}" class="btn btn-primary btn-sm">
                                 <i class="bi bi-pencil"></i> Edit
                             </a>
+                           
                         </div>
+                        
 
                         <div class="row g-4">
                             <div class="col-md-6">

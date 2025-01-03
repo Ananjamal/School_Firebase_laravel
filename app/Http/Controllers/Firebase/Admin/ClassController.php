@@ -57,36 +57,22 @@ class ClassController extends Controller
     }
 
     public function update(Request $request, $id)
-{
-    $validatedData = $request->validate([
-        'grade' => 'required|string',
-        'section' => 'required|string',
-        'teacher' => 'required|string',
-    ]);
+    {
+        $validatedData = $request->validate([
+            'grade' => 'required|string',
+            'section' => 'required|string',
+            'teacher' => 'required|string',
+        ]);
+        $classRef = $this->database->getReference("school/classes/$id");
 
-    // Get the existing class data
-    $classRef = $this->database->getReference("school/classes/$id");
-    // $existingClass = $classRef->getValue();
+        $classRef->update([
+            'grade' => $validatedData['grade'],
+            'section' => $validatedData['section'],
+            'teacher' => $validatedData['teacher'],
+        ]);
 
-    // if (!$existingClass) {
-    //     return redirect()->route('classes.index')->with('error', 'Class not found.');
-    // }
-
-    // // Merge the existing data with the updated data
-    // $updatedData = array_merge($existingClass, $validatedData);
-
-    // // Update the class in Firebase
-    // $classRef->set($updatedData);
-    $classRef->update([
-        'grade' => $validatedData['grade'],
-        'section' => $validatedData['section'],
-        'teacher' => $validatedData['teacher'],
-
-    ]);
-
-    return redirect()->route('classes.index')->with('success', 'Class updated successfully!');
-}
-
+        return redirect()->route('classes.index')->with('success', 'Class updated successfully!');
+    }
 
     public function destroy($id)
     {

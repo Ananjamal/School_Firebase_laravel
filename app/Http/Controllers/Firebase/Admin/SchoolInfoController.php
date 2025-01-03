@@ -15,10 +15,37 @@ class SchoolInfoController extends Controller
         $this->database = $database;
     }
 
-    public function index(){
+    public function index()
+    {
         $school = $this->database->getReference('school')->getValue();
 
-        return view('firebase.admin.school.main',compact('school'));
+        return view('firebase.admin.school.main', compact('school'));
+    }
+    public function edit()
+    {
+        $school = $this->database->getReference('school')->getValue();
+        return view('firebase.admin.school.edit', compact('school'));
     }
 
+    public function update(Request $request)
+    {
+        $validatedData = $request->validate([
+            'name' => 'required|string',
+            'address' => 'required|string',
+            'phone' => 'required|string',
+            'email' => 'required|string',
+        ]);
+
+        $schoolRef = $this->database->getReference('school');
+        $schoolRef->update([
+            'name' => $validatedData['name'],
+            'address' => $validatedData['address'],
+            'contact' => [
+                'phone' => $validatedData['phone'],
+                'email' => $validatedData['email'],
+            ],
+        ]);
+
+        return redirect()->route('dashboard')->with('success', 'School updated successfully!');
+    }
 }

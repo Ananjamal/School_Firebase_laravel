@@ -68,7 +68,6 @@ $studentKey = 'student_' . $nextStudentIndex;
 
     public function update(Request $request, $classId, $studentId)
 {
-    // Step 1: Validate the incoming request
     $validatedData = $request->validate([
         'name' => 'required|string|max:255',
         'age' => 'required|integer',
@@ -83,7 +82,6 @@ $studentKey = 'student_' . $nextStudentIndex;
         'gender' => $validatedData['gender'],
     ]);
 
-    // Step 5: Redirect with a success message
     return redirect()->route('students.index')->with('success', 'Student updated successfully!');
 }
 

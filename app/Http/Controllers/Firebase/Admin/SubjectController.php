@@ -22,41 +22,39 @@ class SubjectController extends Controller
     }
 
     public function create()
-
     {
         $classes = $this->database->getReference('school/classes')->getValue();
         return view('firebase.admin.subjects.create', compact('classes'));
     }
 
     public function store(Request $request)
-{
-    $validatedData = $request->validate([
-        'name' => 'required|string|max:255',
-        'teacher' => 'required|string',
-        'class_id' => 'required|string',
-    ]);
+    {
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255',
+            'teacher' => 'required|string',
+            'class_id' => 'required|string',
+        ]);
 
-    $classId = $validatedData['class_id'];
+        $classId = $validatedData['class_id'];
 
-    $subjectReference = $this->database->getReference("school/classes/$classId/subjects");
+        $subjectReference = $this->database->getReference("school/classes/$classId/subjects");
 
-$subjects = $subjectReference->getValue();
+        $subjects = $subjectReference->getValue();
 
-$subjects = $subjects ?: [];
+        $subjects = $subjects ?: [];
 
-$nextSubjectIndex = count($subjects) + 1;
-$subjectKey = 'subject_' . $nextSubjectIndex;
+        $nextSubjectIndex = count($subjects) + 1;
+        $subjectKey = 'subject_' . $nextSubjectIndex;
 
+        $newSubjectData = [
+            'name' => $validatedData['name'],
+            'teacher' => $validatedData['teacher'],
+        ];
 
-    $newSubjectData = [
-        'name' => $validatedData['name'],
-        'teacher' => $validatedData['teacher'],
-    ];
+        $subjectReference->getChild($subjectKey)->set($newSubjectData);
 
-    $subjectReference->getChild($subjectKey)->set($newSubjectData);
-
-    return redirect()->route('subjects.index')->with('success', 'Subject added successfully!');
-}
+        return redirect()->route('subjects.index')->with('success', 'Subject added successfully!');
+    }
 
     public function edit($classId, $subjectId)
     {
@@ -65,38 +63,25 @@ $subjectKey = 'subject_' . $nextSubjectIndex;
     }
 
     public function update(Request $request, $classId, $subjectId)
-{
-    // Step 1: Validate the incoming request
-    $validatedData = $request->validate([
-        'name' => 'required|string|max:255',
-        'teacher' => 'required|string|max:255',
-    ]);
+    {
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255',
+            'teacher' => 'required|string|max:255',
+        ]);
 
-    // Step 2: Reference the Firebase database for the specific student
-    $subjectReference = $this->database->getReference("school/classes/$classId/subjects/$subjectId");
+        $subjectReference = $this->database->getReference("school/classes/$classId/subjects/$subjectId");
 
-    // Step 3: Check if the student exists
-    $existingSubject = $subjectReference->getValue();
+        $subjectReference->update([
+            'name' => $validatedData['name'],
+            'teacher' => $validatedData['teacher'],
+        ]);
 
-    // If the student does not exist, handle the error
-    if (!$existingSubject) {
-        return redirect()->route('subjects.index')->with('error', 'subject not found!');
+        return redirect()->route('subjects.index')->with('success', 'Subject updated successfully!');
     }
 
-    // Step 4: Update the student data with the validated data
-    $subjectReference->update([
-        'name' => $validatedData['name'],
-        'teacher' => $validatedData['teacher'],
-    ]);
-
-    // Step 5: Redirect with a success message
-    return redirect()->route('subjects.index')->with('success', 'Subject updated successfully!');
-}
-
-public function destroy($classId, $subjectId)
-{
-    $this->database->getReference("school/classes/$classId/subjects/$subjectId")->remove();
-    return redirect()->route('subjects.index')->with('success', 'subject deleted successfully!');
-}
-
+    public function destroy($classId, $subjectId)
+    {
+        $this->database->getReference("school/classes/$classId/subjects/$subjectId")->remove();
+        return redirect()->route('subjects.index')->with('success', 'subject deleted successfully!');
+    }
 }
