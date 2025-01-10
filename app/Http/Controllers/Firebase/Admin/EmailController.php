@@ -1,0 +1,128 @@
+<?php
+namespace App\Http\Controllers\Firebase\Admin;
+
+use App\Jobs\SendEmailJob;
+use Illuminate\Http\Request;
+use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\StudentNotificationMail;
+use Kreait\Firebase\Contract\Database;
+use Illuminate\Pagination\LengthAwarePaginator;
+use App\Http\Controllers\Controller;
+
+class EmailController extends Controller
+{
+    protected $database;
+
+    public function __construct(Database $database)
+    {
+        $this->database = $database;
+    }
+
+    public function getAllStudents(Request $request)
+    {
+        // Paginate classes (let's paginate by 10 classes per page)
+        $perPageClasses = 1;
+        $classes = range(1, 1000); // List of classes
+
+        $page = Paginator::resolveCurrentPage();
+        $currentPageClasses = array_slice($classes, ($page - 1) * $perPageClasses, $perPageClasses);
+
+        $paginatedClasses = new LengthAwarePaginator(
+            $currentPageClasses,
+            count($classes),
+            $perPageClasses,
+            $page,
+            ['path' => Paginator::resolveCurrentPath()]
+        );
+
+        $allStudents = [];
+
+        foreach ($paginatedClasses as $class) {
+            $students = $this->database->getReference('class_' . $class)->getValue();
+
+            if ($students) {
+                $classData = [];
+
+                foreach ($students as $id => $student) {
+                    $classData[] = [
+                        'id' => $id,
+                        'name' => $student['name'],
+                        'email' => $student['email'],
+                        'phone' => $student['phone'],
+                    ];
+                }
+
+                $allStudents['class_' . $class] = $classData;
+            } else {
+                $allStudents['class_' . $class] = 'Class not found';
+            }
+        }
+
+        return view('firebase.students.index', compact('allStudents', 'paginatedClasses'));
+    }
+
+    // Send email to all students
+    public function sendEmailToAll()
+    {
+        // Fetch all class names dynamically from your database or Firebase.
+        $classes = $this->database->getReference()->getChildKeys(); // This will get all class names like class_1, class_2, etc.
+    
+        // Process each class.
+        foreach ($classes as $className) {
+            // Fetch students for the current class
+            $students = $this->database->getReference($className)->getValue();
+    
+            // Check if students exist in the class
+            if ($students) {
+                // Chunk students in batches for better performance
+                $chunks = array_chunk($students, 50); // Adjust chunk size if needed
+    
+                foreach ($chunks as $chunk) {
+                    foreach ($chunk as $id => $student) {
+                        $emailDetails = [
+                            'email' => $student['email'],
+                            'subject' => 'School Notification',
+                            'title' => 'Dear ' . $student['name'],
+                            'message' => 'This is a bulk notification for all students.',
+                        ];
+                        // Dispatch email job to the queue
+                        SendEmailJob::dispatch($emailDetails)->onQueue('emails');
+                    }
+                }
+            }
+        }
+        return redirect()->route('students.index')->with('success', 'Emails are being sent to all students!');
+
+    }
+    
+
+    // Send email to a single student
+    public function sendEmailToStudent(Request $request)
+    {
+
+// dd($request->class_id , $request->student_id);
+        // Fetch the student from the database
+        $student = $this->database->getReference( $request->class_id . '/' . $request->student_id)->getValue();
+        // $student = $this->database->getReference('class_1/student_5')->getValue();
+        // dd($student);
+        if (!$student) {
+            dd('asd');
+
+            return response()->json(['message' => 'Student not found!'], 404);
+        }
+
+        // Prepare email details
+        $emailDetails = [
+            'email' => $student['email'],
+            'subject' => 'Personal Notification',
+            'title' => 'Dear ' . $student['name'],
+            'message' => $request->message,
+        ];
+        
+        SendEmailJob::dispatch($emailDetails)->onQueue('emails');
+        return redirect()->route('students.index')->with('success', 'Email is being sent to the student ' .$emailDetails['email'] );
+
+        // return response()->json(['message' => 'Email is being sent to the student!']);
+    }
+}

@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Firebase\ContactController;
 use App\Http\Controllers\Firebase\Admin\ClassController;
+use App\Http\Controllers\Firebase\Admin\EmailController;
 use App\Http\Controllers\Firebase\Admin\StaffController;
 use App\Http\Controllers\Firebase\Admin\StudentController;
 use App\Http\Controllers\Firebase\Admin\SubjectController;
@@ -10,15 +11,15 @@ use App\Http\Controllers\Firebase\Admin\DashboardController;
 use App\Http\Controllers\Firebase\Admin\SchoolInfoController;
 
 
-Route::get('/', function () {
-    return view('welcome');
-});
+// Route::get('/', function () {
+//     return view('welcome');
+// });
 
-Auth::routes();
+// Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
-Route::get('/dashboard', [SchoolInfoController::class, 'index'])->name('dashboard');
+Route::get('/', [SchoolInfoController::class, 'index'])->name('dashboard');
 Route::get('/dashboard/school-edit', [SchoolInfoController::class, 'edit'])->name('dashboard.edit');
 Route::put('/dashboard/school-update', [SchoolInfoController::class, 'update'])->name('dashboard.update');
 
@@ -33,3 +34,10 @@ Route::get('dashboard/classes/{classId}/subjects/{subjectId}/edit', [SubjectCont
 Route::put('dashboard/classes/{classId}/subjects/{subjectId}', [SubjectController::class, 'update'])->name('subjects.update');
 Route::delete('dashboard/classes/{classId}/subjects/{subjectId}', [SubjectController::class, 'destroy'])->name('subjects.destroy');
 Route::resource('dashboard/staff', StaffController::class);
+
+
+
+Route::get('/students', [EmailController::class, 'getAllStudents'])->name('students.index');
+
+Route::post('/send-email-to-all', [EmailController::class, 'sendEmailToAll'])->name('send.email.all');
+Route::post('/send-email-to-student', [EmailController::class, 'sendEmailToStudent'])->name('send.email.student');

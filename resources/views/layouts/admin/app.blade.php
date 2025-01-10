@@ -43,7 +43,7 @@
 
         @include('firebase.admin.includes.header')
 
-        @include('firebase.admin.includes.sidebar')
+        {{-- @include('firebase.admin.includes.sidebar') --}}
 
             @yield( 'content' )
 
