@@ -22,9 +22,8 @@ class EmailController extends Controller
 
     public function getAllStudents(Request $request)
     {
-        // Paginate classes (let's paginate by 10 classes per page)
         $perPageClasses = 1;
-        $classes = range(1, 1000); // List of classes
+        $classes = range(1, 1000);
 
         $page = Paginator::resolveCurrentPage();
         $currentPageClasses = array_slice($classes, ($page - 1) * $perPageClasses, $perPageClasses);
@@ -65,7 +64,6 @@ class EmailController extends Controller
 
     public function sendEmailToAll()
     {
-        // Fetch all class names dynamically from your database or Firebase.
         $classes = $this->database->getReference()->getChildKeys();
         dispatch(new SendEmailToAllJob($classes));
 

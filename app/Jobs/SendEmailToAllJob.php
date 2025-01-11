@@ -34,11 +34,9 @@ class SendEmailToAllJob implements ShouldQueue
     {
         // dd(['classes' => $this->classes]);
         foreach ($this->classes as $className) {
-            // Fetch students for the current class from Firebase
             $students = $database->getReference($className)->getValue();
 
             if ($students) {
-                // Chunk students for better performance
                 $chunks = array_chunk($students, 10);
 
                 foreach ($chunks as $chunk) {
@@ -50,7 +48,6 @@ class SendEmailToAllJob implements ShouldQueue
                             'message' => 'This is a bulk notification for all students.',
                         ];
 
-                        // Send the email
                         Mail::raw($emailDetails['message'], function ($message) use ($emailDetails) {
                             $message->to($emailDetails['email'])
                                 ->subject($emailDetails['subject']);

@@ -57,7 +57,6 @@
         </table>
         @endforeach
 
-        <!-- Pagination for classes -->
         <div class="d-flex justify-content-center">
             {{ $paginatedClasses->links('pagination::bootstrap-5') }}
         </div>
