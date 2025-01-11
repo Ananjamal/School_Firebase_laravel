@@ -8,8 +8,9 @@
 
         <form action="{{ route('send.email.all') }}" method="POST">
             @csrf
-            <button type="submit" class="btn btn-primary" style="float: right">Send Email to All Students</button>
+            <button type="submit" class="btn btn-primary" style="float: right">Send Emails to All</button>
         </form>
+
         @if(session('success'))
                 <div class="shadow alert alert-success alert-dismissible fade show" role="alert">
                     <strong>Success!</strong> {{ session('success') }}

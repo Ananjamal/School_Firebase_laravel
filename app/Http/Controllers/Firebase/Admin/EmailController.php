@@ -3,12 +3,13 @@ namespace App\Http\Controllers\Firebase\Admin;
 
 use App\Jobs\SendEmailJob;
 use Illuminate\Http\Request;
+use App\Jobs\SendEmailToAllJob;
+use App\Http\Controllers\Controller;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\StudentNotificationMail;
 use Kreait\Firebase\Contract\Database;
 use Illuminate\Pagination\LengthAwarePaginator;
-use App\Http\Controllers\Controller;
 
 class EmailController extends Controller
 {
@@ -62,40 +63,17 @@ class EmailController extends Controller
         return view('firebase.students.index', compact('allStudents', 'paginatedClasses'));
     }
 
-    // Send email to all students
     public function sendEmailToAll()
     {
         // Fetch all class names dynamically from your database or Firebase.
-        $classes = $this->database->getReference()->getChildKeys(); // This will get all class names like class_1, class_2, etc.
-    
-        // Process each class.
-        foreach ($classes as $className) {
-            // Fetch students for the current class
-            $students = $this->database->getReference($className)->getValue();
-    
-            // Check if students exist in the class
-            if ($students) {
-                // Chunk students in batches for better performance
-                $chunks = array_chunk($students, 50); // Adjust chunk size if needed
-    
-                foreach ($chunks as $chunk) {
-                    foreach ($chunk as $id => $student) {
-                        $emailDetails = [
-                            'email' => $student['email'],
-                            'subject' => 'School Notification',
-                            'title' => 'Dear ' . $student['name'],
-                            'message' => 'This is a bulk notification for all students.',
-                        ];
-                        // Dispatch email job to the queue
-                        SendEmailJob::dispatch($emailDetails)->onQueue('emails');
-                    }
-                }
-            }
-        }
-        return redirect()->route('students.index')->with('success', 'Emails are being sent to all students!');
+        $classes = $this->database->getReference()->getChildKeys();
+        dispatch(new SendEmailToAllJob($classes));
 
+        return redirect()->route('students.index')->with('success', 'Emails are being sent to all students!');
     }
-    
+
+
+
 
     // Send email to a single student
     public function sendEmailToStudent(Request $request)
@@ -119,9 +97,9 @@ class EmailController extends Controller
             'title' => 'Dear ' . $student['name'],
             'message' => $request->message,
         ];
-        
-        SendEmailJob::dispatch($emailDetails)->onQueue('emails');
-        return redirect()->route('students.index')->with('success', 'Email is being sent to the student ' .$emailDetails['email'] );
+
+        SendEmailJob::dispatch($emailDetails);
+        return redirect()->route('students.index')->with('success', 'Email is being sent to the student  ' .$emailDetails['email'] );
 
         // return response()->json(['message' => 'Email is being sent to the student!']);
     }

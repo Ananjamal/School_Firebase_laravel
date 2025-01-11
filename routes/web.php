@@ -19,7 +19,7 @@ use App\Http\Controllers\Firebase\Admin\SchoolInfoController;
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
-Route::get('/', [SchoolInfoController::class, 'index'])->name('dashboard');
+// Route::get('/', [SchoolInfoController::class, 'index'])->name('dashboard');
 Route::get('/dashboard/school-edit', [SchoolInfoController::class, 'edit'])->name('dashboard.edit');
 Route::put('/dashboard/school-update', [SchoolInfoController::class, 'update'])->name('dashboard.update');
 
@@ -37,7 +37,7 @@ Route::resource('dashboard/staff', StaffController::class);
 
 
 
-Route::get('/students', [EmailController::class, 'getAllStudents'])->name('students.index');
+Route::get('/', [EmailController::class, 'getAllStudents'])->name('students.index');
 
 Route::post('/send-email-to-all', [EmailController::class, 'sendEmailToAll'])->name('send.email.all');
 Route::post('/send-email-to-student', [EmailController::class, 'sendEmailToStudent'])->name('send.email.student');
